@@ -18,8 +18,16 @@ import io
 _ANSI = re.compile(r'\x1b\[[0-9;]*[mGKHFABCDJK]')
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
-NOTEBOOK_DIR   = Path(__file__).parent
-JUPYTER_NBCONV = Path(r"C:\Users\gpoli\venvs\caece-mineria\Scripts\jupyter-nbconvert.exe")
+NOTEBOOK_DIR = Path(__file__).parent
+
+# Locate jupyter-nbconvert: try the local venv first, then fall back to PATH
+_LOCAL_NBCONV = Path(r"C:\Users\gpoli\venvs\caece-mineria\Scripts\jupyter-nbconvert.exe")
+if _LOCAL_NBCONV.exists():
+    JUPYTER_NBCONV = _LOCAL_NBCONV
+else:
+    import shutil as _shutil
+    _which = _shutil.which("jupyter-nbconvert") or _shutil.which("jupyter")
+    JUPYTER_NBCONV = Path(_which) if _which else Path("jupyter-nbconvert")
 CLASS_NAMES    = ["ok", "patologica"]
 IMG_SIZE       = (224, 224)
 
