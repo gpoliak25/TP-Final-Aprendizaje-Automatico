@@ -5,3 +5,4 @@ Pillow>=10.0
 tensorflow-cpu>=2.15,<2.22
 nbconvert>=7.0
 ipykernel>=6.0
+plotly>=5.18

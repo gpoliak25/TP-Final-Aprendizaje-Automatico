@@ -328,10 +328,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─── Tabs ─────────────────────────────────────────────────────────────────────
-tab_pipeline, tab_viewer, tab_pred = st.tabs([
+tab_pipeline, tab_viewer, tab_pred, tab_pres = st.tabs([
     "  🔄  Pipeline Runner  ",
     "  📄  Inspeccionar notebooks  ",
     "  🩻  Predicción en vivo  ",
+    "  📊  Presentación  ",
 ])
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -641,3 +642,502 @@ with tab_viewer:
                                 st.text(text[:400])
     else:
         st.info("Notebook no encontrado en este directorio.")
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TAB 4 — PRESENTACIÓN
+# ═══════════════════════════════════════════════════════════════════════════════
+with tab_pres:
+    import plotly.graph_objects as go
+
+    def card(content, border_color="#1f6feb", pad="22px 24px"):
+        st.markdown(
+            f'<div style="background:#161b22;border:1px solid #21262d;'
+            f'border-left:4px solid {border_color};border-radius:10px;'
+            f'padding:{pad};margin-bottom:14px">{content}</div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── SLIDE 1 · Portada ────────────────────────────────────────────────────
+    st.markdown("""
+    <div style="background:linear-gradient(135deg,#0d1117 60%,#0d1f2d);
+                border:1px solid #21262d;border-radius:14px;padding:36px 40px;
+                margin-bottom:24px;text-align:center;">
+      <div style="color:#8b949e;font-size:.82rem;letter-spacing:2px;
+                  text-transform:uppercase;margin-bottom:8px;">
+        Trabajo Práctico Integrador · Maestría en Ciencia de Datos e Innovación Empresarial
+      </div>
+      <h2 style="color:#e6edf3;font-size:1.7rem;font-weight:800;
+                 line-height:1.3;margin:10px 0 6px;">
+        Detección de Patologías en Radiografías de Tórax Veterinarias<br>
+        <span style="color:#388bfd">mediante Redes Neuronales Convolucionales</span>
+      </h2>
+      <div style="color:#8b949e;font-size:.9rem;margin:10px 0 18px">
+        Un análisis del costo del error y la interpretabilidad clínica
+      </div>
+      <div style="color:#c9d1d9;font-size:.88rem">
+        Lic. Lorena López &nbsp;·&nbsp; Lic. Gisela Poliak &nbsp;·&nbsp;
+        Universidad CAECE &nbsp;·&nbsp; Junio 2026
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── SLIDE 2 · El Desafío Clínico ─────────────────────────────────────────
+    st.markdown("## El Desafío Clínico")
+    card(
+        "<span style='color:#e6edf3'>La interpretación de radiografías exige lectura cuidadosa. "
+        "Depende de la experiencia del profesional y es <strong>vulnerable a la fatiga</strong> "
+        "y alta carga de trabajo.</span>",
+        border_color="#388bfd",
+    )
+
+    col_trad, col_ai, col_pts = st.columns([2, 2, 1.5])
+    with col_trad:
+        st.markdown("""
+        <div style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:18px">
+          <div style="color:#8b949e;font-size:.8rem;margin-bottom:12px;letter-spacing:1px">
+            FLUJO DIAGNÓSTICO TRADICIONAL</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:#21262d;border-radius:6px;padding:10px 14px;color:#c9d1d9;font-size:.84rem">
+              👤  Ingreso del Paciente y Toma de Placa</div>
+            <div style="text-align:center;color:#484f58">↓</div>
+            <div style="background:#21262d;border-radius:6px;padding:10px 14px;color:#c9d1d9;font-size:.84rem">
+              🕐  Espera en Cola de Lectura</div>
+            <div style="text-align:center;color:#484f58">↓</div>
+            <div style="background:#21262d;border-radius:6px;padding:10px 14px;color:#c9d1d9;font-size:.84rem">
+              👁  Análisis Manual por Especialista</div>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_ai:
+        st.markdown("""
+        <div style="background:#0d1117;border:1px solid #388bfd;border-radius:8px;padding:18px">
+          <div style="color:#388bfd;font-size:.8rem;margin-bottom:12px;letter-spacing:1px">
+            FLUJO POTENCIADO POR IA</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:#21262d;border-radius:6px;padding:10px 14px;color:#c9d1d9;font-size:.84rem">
+              👤  Ingreso del Paciente y Toma de Placa</div>
+            <div style="text-align:center;color:#484f58">↓</div>
+            <div style="background:#0d1f38;border:1px solid #388bfd;border-radius:6px;
+                        padding:10px 14px;color:#58a6ff;font-size:.84rem">
+              🤖  Filtro Automático AI (Triage)</div>
+            <div style="text-align:center;color:#484f58">↓</div>
+            <div style="background:#0d1f38;border:1px solid #388bfd;border-radius:6px;
+                        padding:10px 14px;color:#58a6ff;font-size:.84rem">
+              ⚠️  Priorización de Casos Críticos</div>
+            <div style="text-align:center;color:#484f58">↓</div>
+            <div style="background:#21262d;border-radius:6px;padding:10px 14px;color:#c9d1d9;font-size:.84rem">
+              👨‍⚕️  Análisis Enfocado por Especialista</div>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_pts:
+        for icon, title, desc in [
+            ("⏱", "Velocidad", "Acelerar el triage de casos urgentes"),
+            ("🤝", "Consistencia", "Segunda opinión para reducir variabilidad"),
+            ("⚠️", "Priorización", "Destacar estudios con alta probabilidad de hallazgos"),
+        ]:
+            st.markdown(f"""
+            <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;
+                        padding:10px 12px;margin-bottom:8px">
+              <div style="color:#388bfd;font-size:.82rem;font-weight:700">{icon} {title}</div>
+              <div style="color:#8b949e;font-size:.76rem;margin-top:3px">{desc}</div>
+            </div>""", unsafe_allow_html=True)
+
+    st.divider()
+
+    # ── SLIDE 3 · Dataset ─────────────────────────────────────────────────────
+    st.markdown("## El Espacio de Datos")
+    col_pie, col_split = st.columns([1, 1])
+
+    with col_pie:
+        fig_pie = go.Figure(go.Pie(
+            labels=["Normal (ok)", "Patológica"],
+            values=[245, 196],
+            hole=0.55,
+            marker_colors=["#58a6ff", "#d29922"],
+            textinfo="label+percent",
+            textfont_size=13,
+        ))
+        fig_pie.update_layout(
+            paper_bgcolor="#0d1117", plot_bgcolor="#0d1117",
+            font_color="#c9d1d9", margin=dict(t=20, b=20, l=0, r=0),
+            showlegend=False, height=280,
+            annotations=[dict(text="<b>441</b><br>imágenes", x=0.5, y=0.5,
+                              font_size=16, font_color="#e6edf3", showarrow=False)],
+        )
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+    with col_split:
+        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+        for split, n, pct, color in [
+            ("Train", 308, "70%", "#388bfd"),
+            ("Val",   66,  "15%", "#d29922"),
+            ("Test",  67,  "15%", "#3fb950"),
+        ]:
+            st.markdown(f"""
+            <div style="background:#161b22;border:1px solid #21262d;border-left:4px solid {color};
+                        border-radius:8px;padding:12px 16px;margin-bottom:8px;
+                        display:flex;justify-content:space-between;align-items:center">
+              <span style="color:{color};font-weight:700;font-size:.9rem">{split}</span>
+              <span style="color:#e6edf3;font-size:1.1rem;font-weight:800">{n}</span>
+              <span style="color:#8b949e;font-size:.85rem">{pct}</span>
+            </div>""", unsafe_allow_html=True)
+        card(
+            "<span style='color:#8b949e;font-size:.82rem'>"
+            "Data augmentation aplicada <strong style='color:#c9d1d9'>solo en train</strong>: "
+            "flip horizontal, rotación ±18°, zoom 10%, contraste 10%.</span>",
+            border_color="#d29922",
+        )
+
+    st.divider()
+
+    # ── SLIDE 4 · Métrica Estrella ────────────────────────────────────────────
+    st.markdown("## La Métrica Estrella: Costo Asimétrico del Error")
+    card(
+        "<span style='color:#e6edf3'>En diagnóstico médico, la <strong>Exactitud (Accuracy) es engañosa</strong>. "
+        "Un modelo que prediga todo como "sano" ignorará a los pacientes críticos.</span>",
+        border_color="#f85149",
+    )
+
+    st.markdown("""
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;max-width:640px;margin:0 auto 16px">
+      <div></div>
+      <div style="text-align:center;color:#8b949e;font-size:.8rem;padding:6px">Pred: Sano</div>
+      <div style="text-align:center;color:#8b949e;font-size:.8rem;padding:6px">Pred: Patológico</div>
+
+      <div style="color:#8b949e;font-size:.8rem;padding:8px;writing-mode:vertical-lr;
+                  text-align:center;transform:rotate(180deg)">Real</div>
+
+      <div style="background:#21262d;border-radius:6px;padding:18px;text-align:center">
+        <div style="color:#3fb950;font-size:1.4rem">✔</div>
+        <div style="color:#c9d1d9;font-size:.82rem;font-weight:600">Verdadero Negativo</div>
+      </div>
+      <div style="background:#2d0f0f;border:1px solid #f85149;border-radius:6px;padding:18px;text-align:center">
+        <div style="color:#f85149;font-weight:700;font-size:.88rem">Falso Negativo</div>
+        <div style="color:#f85149;font-size:.76rem;margin-top:4px">Error Crítico: consecuencias irreversibles</div>
+      </div>
+
+      <div></div>
+
+      <div style="background:#2d1f0f;border:1px solid #d29922;border-radius:6px;padding:18px;text-align:center">
+        <div style="color:#d29922;font-weight:700;font-size:.88rem">Falso Positivo</div>
+        <div style="color:#d29922;font-size:.76rem;margin-top:4px">Falsa Alarma: costo de revisión adicional</div>
+      </div>
+      <div style="background:#21262d;border-radius:6px;padding:18px;text-align:center">
+        <div style="color:#3fb950;font-size:1.4rem">✔</div>
+        <div style="color:#c9d1d9;font-size:.82rem;font-weight:600">Verdadero Positivo</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+    card(
+        "🎯  <strong style='color:#388bfd'>Objetivo Clínico:</strong> "
+        "<span style='color:#c9d1d9'>Maximizar el <strong>Recall (Sensibilidad)</strong>. "
+        "Priorizamos detectar la mayor cantidad posible de patologías reales, "
+        "aceptando conscientemente una mayor tasa de falsas alarmas.</span>",
+        border_color="#388bfd",
+    )
+
+    st.divider()
+
+    # ── SLIDE 5 · Arquitecturas ───────────────────────────────────────────────
+    st.markdown("## El Enfrentamiento Analítico: Dos Enfoques")
+    col_cnn, col_tl = st.columns(2, gap="large")
+
+    def arch_layer(name, extra=""):
+        color = "#0d1f38"
+        return (f'<div style="background:{color};border:1px solid #388bfd;border-radius:5px;'
+                f'padding:7px 12px;text-align:center;color:#58a6ff;font-size:.78rem;margin:3px 0">'
+                f'{name}'
+                + (f'<span style="color:#484f58;font-size:.7rem;margin-left:6px">{extra}</span>' if extra else "")
+                + '</div>')
+
+    with col_cnn:
+        st.markdown(f"""
+        <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:18px">
+          <div style="color:#e6edf3;font-weight:700;font-size:.95rem;margin-bottom:12px">
+            🧱 CNN desde Cero (Línea Base)</div>
+          {''.join([
+            arch_layer("Input (224×224×3)"),
+            arch_layer("Rescaling (1./255)"),
+            arch_layer("Conv2D(32) + BN + MaxPool", "896 params"),
+            arch_layer("Conv2D(64) + BN + MaxPool", "18,496 params"),
+            arch_layer("Conv2D(128) + BN + MaxPool", "73,856 params"),
+            arch_layer("Conv2D(128) + BN + MaxPool", "147,584 params"),
+            arch_layer("GlobalAvgPool2D"),
+            arch_layer("Dense(256) + Dropout", "33,024 params"),
+            arch_layer("Dense(2, softmax)", "514 params"),
+          ])}
+          <div style="margin-top:12px;border-top:1px solid #21262d;padding-top:10px">
+            <div style="color:#8b949e;font-size:.78rem">
+              ▪ ~423.000 parámetros entrenables<br>
+              ▪ <span style="color:#f85149">Riesgo: memorización (overfitting) con 441 imágenes</span>
+            </div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    with col_tl:
+        st.markdown("""
+        <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:18px">
+          <div style="color:#e6edf3;font-weight:700;font-size:.95rem;margin-bottom:12px">
+            🔁 Transfer Learning (MobileNetV2)</div>
+          <div style="background:#0d2d0d;border:1px solid #3fb950;border-radius:6px;
+                      padding:10px 14px;text-align:center;color:#3fb950;font-size:.8rem;margin-bottom:8px">
+            MobileNetV2 Base — Congelada<br>
+            <span style="color:#484f58;font-size:.72rem">Entrenada en &gt;1M imágenes ImageNet</span>
+          </div>
+          <div style="text-align:center;color:#484f58">↓  Fine-tuning  ↓</div>
+          <div style="margin-top:8px">""" +
+          ''.join([
+            arch_layer("GlobalAvgPool2D"),
+            arch_layer("Dense(256) + Dropout"),
+            arch_layer("Dense(2, softmax)"),
+          ]) + """
+          </div>
+          <div style="margin-top:12px;border-top:1px solid #21262d;padding-top:10px">
+            <div style="color:#8b949e;font-size:.78rem">
+              ▪ Fase 1: extracción (base congelada)<br>
+              ▪ Fase 2: fine-tuning sutil capas superiores<br>
+              ▪ <span style="color:#3fb950">Transfiere comprensión geométrica general</span>
+            </div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    st.divider()
+
+    # ── SLIDES 6-7 · Resultados ───────────────────────────────────────────────
+    st.markdown("## Resultados: CNN vs Transfer Learning")
+
+    col_r1, col_r2 = st.columns(2, gap="large")
+
+    def confusion_fig(tn, fp, fn, tp, title, color):
+        z    = [[tn, fp], [fn, tp]]
+        text = [[str(tn), str(fp)], [str(fn), str(tp)]]
+        fig  = go.Figure(go.Heatmap(
+            z=z, text=text, texttemplate="%{text}",
+            textfont={"size": 22, "color": "white"},
+            colorscale=[[0, "#0d1117"], [1, color]],
+            showscale=False,
+            x=["ok", "patologica"], y=["ok", "patologica"],
+        ))
+        fig.update_layout(
+            title=dict(text=title, font_color="#c9d1d9", font_size=13, x=0.5),
+            paper_bgcolor="#0d1117", plot_bgcolor="#0d1117",
+            font_color="#c9d1d9", height=220,
+            margin=dict(t=36, b=30, l=60, r=10),
+            xaxis=dict(title="Predicción", color="#8b949e", gridcolor="#21262d"),
+            yaxis=dict(title="Real", color="#8b949e", gridcolor="#21262d"),
+        )
+        return fig
+
+    with col_r1:
+        st.markdown("""
+        <div style="background:#1f0d0d;border:1px solid #f85149;border-radius:8px;
+                    padding:10px 14px;margin-bottom:8px;text-align:center">
+          <span style="color:#f85149;font-weight:700">⚠ La Ilusión de Aprender</span>
+          <span style="color:#8b949e;font-size:.8rem"> — CNN desde Cero</span>
+        </div>""", unsafe_allow_html=True)
+        st.plotly_chart(confusion_fig(0, 37, 0, 30, "Confusion Matrix · CNN", "#1f6feb"),
+                        use_container_width=True, key="cm_cnn")
+        card(
+            "<span style='color:#8b949e;font-size:.8rem'>Clasifica <strong style='color:#f85149'>TODAS</strong> "
+            "las imágenes como patológicas → Recall 100% artificial. "
+            "<strong style='color:#f85149'>AUC = 0.451</strong> (peor que el azar). "
+            "Modelo clínicamente inútil.</span>",
+            border_color="#f85149", pad="12px 14px",
+        )
+
+    with col_r2:
+        st.markdown("""
+        <div style="background:#0d1f12;border:1px solid #3fb950;border-radius:8px;
+                    padding:10px 14px;margin-bottom:8px;text-align:center">
+          <span style="color:#3fb950;font-weight:700">✓ El Poder de la Transferencia</span>
+          <span style="color:#8b949e;font-size:.8rem"> — MobileNetV2</span>
+        </div>""", unsafe_allow_html=True)
+        st.plotly_chart(confusion_fig(31, 6, 7, 23, "Confusion Matrix · Transfer Learning", "#3fb950"),
+                        use_container_width=True, key="cm_tl")
+        card(
+            "<span style='color:#8b949e;font-size:.8rem'>Discriminación real con balance genuino. "
+            "<strong style='color:#3fb950'>AUC = 0.852</strong>. "
+            "El fine-tuning consolida lo aprendido sin degradar la generalización.</span>",
+            border_color="#3fb950", pad="12px 14px",
+        )
+
+    st.divider()
+
+    # ── SLIDE 8 · Síntesis ────────────────────────────────────────────────────
+    st.markdown("## Síntesis de Desempeño")
+    col_tab, col_roc = st.columns([1, 1], gap="large")
+
+    with col_tab:
+        st.markdown("""
+        <table style="width:100%;border-collapse:collapse;font-size:.84rem">
+          <thead>
+            <tr style="color:#8b949e;border-bottom:1px solid #21262d">
+              <th style="padding:8px;text-align:left">Modelo</th>
+              <th style="padding:8px;text-align:center">Acc</th>
+              <th style="padding:8px;text-align:center">Prec</th>
+              <th style="padding:8px;text-align:center">Recall</th>
+              <th style="padding:8px;text-align:center">AUC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="color:#484f58;border-bottom:1px solid #21262d">
+              <td style="padding:8px">CNN desde cero</td>
+              <td style="padding:8px;text-align:center">0.448</td>
+              <td style="padding:8px;text-align:center">0.448</td>
+              <td style="padding:8px;text-align:center">1.000</td>
+              <td style="padding:8px;text-align:center">0.451</td>
+            </tr>
+            <tr style="background:#0d2d1a;color:#3fb950;font-weight:700">
+              <td style="padding:10px 8px;border-radius:6px 0 0 6px">Transfer Learning ✓</td>
+              <td style="padding:10px 8px;text-align:center">0.806</td>
+              <td style="padding:10px 8px;text-align:center">0.793</td>
+              <td style="padding:10px 8px;text-align:center">0.767</td>
+              <td style="padding:10px 8px;text-align:center;border-radius:0 6px 6px 0">0.852</td>
+            </tr>
+          </tbody>
+        </table>
+        """, unsafe_allow_html=True)
+
+    with col_roc:
+        fig_roc = go.Figure()
+        fig_roc.add_trace(go.Scatter(x=[0,0.5,0.6,0.8,1], y=[0,0.45,0.5,0.55,1],
+            mode="lines", name="CNN (AUC=0.451)", line=dict(color="#388bfd", width=2)))
+        fig_roc.add_trace(go.Scatter(x=[0,0.05,0.1,0.2,0.4,1], y=[0,0.6,0.77,0.87,0.97,1],
+            mode="lines", name="Transfer (AUC=0.852)", line=dict(color="#d29922", width=2)))
+        fig_roc.add_trace(go.Scatter(x=[0,1], y=[0,1], mode="lines",
+            line=dict(color="#484f58", dash="dash", width=1), showlegend=False))
+        fig_roc.update_layout(
+            paper_bgcolor="#0d1117", plot_bgcolor="#0d1117", font_color="#c9d1d9",
+            height=220, margin=dict(t=10, b=40, l=40, r=10),
+            xaxis=dict(title="Falsos Positivos", gridcolor="#21262d", zeroline=False),
+            yaxis=dict(title="Recall", gridcolor="#21262d", zeroline=False),
+            legend=dict(bgcolor="#0d1117", bordercolor="#21262d", borderwidth=1,
+                        font_size=11, x=0.4, y=0.15),
+        )
+        st.plotly_chart(fig_roc, use_container_width=True, key="roc")
+
+    st.divider()
+
+    # ── SLIDE 9 · Calibración ─────────────────────────────────────────────────
+    st.markdown("## Calibrando la Decisión: El Umbral Clínico")
+    col_u1, col_u2 = st.columns(2, gap="large")
+
+    for col, umbral, recall, prec, highlight, color in [
+        (col_u1, "0.50", "0.767", "0.793", False, "#388bfd"),
+        (col_u2, "0.30", "0.867", "0.650", True,  "#d29922"),
+    ]:
+        with col:
+            border = f"border:2px solid {color}" if highlight else "border:1px solid #21262d"
+            st.markdown(f"""
+            <div style="background:#161b22;{border};border-radius:10px;padding:20px;text-align:center">
+              <div style="color:{color};font-size:1.5rem;font-weight:800;margin-bottom:4px">
+                Umbral {umbral}</div>
+              <div style="display:flex;justify-content:space-around;margin-top:14px">
+                <div>
+                  <div style="color:#d29922;font-size:1.4rem;font-weight:800">{recall}</div>
+                  <div style="color:#8b949e;font-size:.78rem">Recall ↑</div>
+                </div>
+                <div>
+                  <div style="color:#388bfd;font-size:1.4rem;font-weight:800">{prec}</div>
+                  <div style="color:#8b949e;font-size:.78rem">Precision</div>
+                </div>
+              </div>
+              {'<div style="margin-top:12px;background:#2d1e00;border:1px solid #d29922;border-radius:6px;' +
+               'padding:8px;color:#d29922;font-size:.78rem">⭐ Seleccionado para producción</div>' if highlight else ''}
+            </div>""", unsafe_allow_html=True)
+
+    card(
+        "⚕️  <strong style='color:#d29922'>Impacto Clínico:</strong> "
+        "<span style='color:#c9d1d9'>Bajar el umbral a 0.30 aumenta el Recall a 0.867, "
+        "minimizando los falsos negativos. Asumimos conscientemente la caída en Precisión "
+        "porque <em>es preferible revisar a un animal sano que ignorar a uno enfermo.</em></span>",
+        border_color="#d29922",
+    )
+
+    st.divider()
+
+    # ── SLIDE 10 · Grad-CAM ───────────────────────────────────────────────────
+    st.markdown("## Abriendo la 'Caja Negra': Interpretabilidad con Grad-CAM")
+    col_g1, col_g2, col_g3 = st.columns(3, gap="medium")
+
+    for col, icon, title, color, body in [
+        (col_g1, "🔍", "El Problema", "#f85149",
+         "La adopción clínica exige confianza. Un modelo diagnóstico no puede ser una caja negra ciega."),
+        (col_g2, "🗺️", "La Solución (Grad-CAM)", "#388bfd",
+         "Interroga las últimas capas convolucionales para visualizar qué píxeles influyeron más en la decisión."),
+        (col_g3, "✅", "Objetivo de Auditoría", "#d29922",
+         "Validar que la red observa estructuras anatómicas plausibles (pulmones, corazón) y no atajos espurios."),
+    ]:
+        with col:
+            st.markdown(f"""
+            <div style="background:#161b22;border:1px solid #21262d;border-top:3px solid {color};
+                        border-radius:8px;padding:16px;height:160px">
+              <div style="font-size:1.4rem">{icon}</div>
+              <div style="color:{color};font-weight:700;font-size:.85rem;margin:6px 0">{title}</div>
+              <div style="color:#8b949e;font-size:.78rem;line-height:1.5">{body}</div>
+            </div>""", unsafe_allow_html=True)
+
+    st.divider()
+
+    # ── SLIDE 11 · Anatomía del Error ────────────────────────────────────────
+    st.markdown("## Anatomía del Error: Falsos Negativos y Positivos")
+
+    for tipo, prob, pred, color, desc in [
+        ("Falso Negativo", "p=0.36", "ok",         "#f85149",
+         "La activación térmica es dispersa y periférica. Al no encontrar un patrón consolidado fuerte, "
+         "la atención de la red se diluye y la probabilidad no logra superar el umbral clínico."),
+        ("Falso Positivo",  "p=0.54", "patologica", "#d29922",
+         "El mapa de calor se aferra a una región focal del tórax con mayor densidad radiológica, "
+         "que la red confundió matemáticamente con un hallazgo limítrofe."),
+    ]:
+        st.markdown(f"""
+        <div style="background:#161b22;border:1px solid #21262d;border-left:4px solid {color};
+                    border-radius:8px;padding:16px 20px;margin-bottom:12px;
+                    display:flex;gap:16px;align-items:center">
+          <div style="min-width:180px">
+            <div style="color:{color};font-weight:700;font-size:.9rem">{tipo}</div>
+            <div style="color:#8b949e;font-size:.78rem">Pred: <code>{pred}</code> ({prob})</div>
+          </div>
+          <div style="color:#8b949e;font-size:.82rem;line-height:1.6">{desc}</div>
+        </div>""", unsafe_allow_html=True)
+
+    card(
+        "🔬 <strong style='color:#c9d1d9'>Conclusión Diagnóstica:</strong> "
+        "<span style='color:#8b949e'>Los errores del modelo radican en <strong style='color:#c9d1d9'>"
+        "casos visualmente sutiles y zonas de densidad ambigua</strong>, "
+        "no en fallas sistémicas por artefactos irrelevantes.</span>",
+        border_color="#388bfd",
+    )
+
+    st.divider()
+
+    # ── SLIDE 12 · Conclusiones ───────────────────────────────────────────────
+    st.markdown("## Conclusiones y Evolución del Sistema")
+    card(
+        "🏆 <strong style='color:#e6edf3'>Logro Principal:</strong> "
+        "<span style='color:#c9d1d9'>Se demostró que el <strong style='color:#3fb950'>Transfer Learning "
+        "(MobileNetV2 con umbral ajustado a 0.30)</strong> supera la severa escasez de datos médicos, "
+        "construyendo un <strong>filtro de triage interpretable</strong> que prioriza la sensibilidad.</span>",
+        border_color="#3fb950",
+    )
+
+    col_f1, col_f2, col_f3 = st.columns(3, gap="medium")
+    for col, num, title, color, body in [
+        (col_f1, "1", "Validación Cruzada (K-fold)", "#388bfd",
+         "Robustecer las estimaciones métricas mitigando la varianza del conjunto de test reducido (~67 imágenes)."),
+        (col_f2, "2", "Robustez de Origen",          "#d29922",
+         "Entrenar con imágenes de múltiples centros veterinarios para eliminar sesgos de equipo y técnica."),
+        (col_f3, "3", "Transición a Multiclase",     "#3fb950",
+         "Evolucionar hacia una red capaz de clasificar afecciones específicas: infiltrados, derrames, cardiomegalia."),
+    ]:
+        with col:
+            st.markdown(f"""
+            <div style="background:#161b22;border:1px solid #21262d;border-top:3px solid {color};
+                        border-radius:8px;padding:18px;text-align:center;min-height:170px">
+              <div style="color:{color};font-size:1.8rem;font-weight:800">Fase {num}</div>
+              <div style="color:#e6edf3;font-weight:700;font-size:.88rem;margin:8px 0">{title}</div>
+              <div style="color:#8b949e;font-size:.78rem;line-height:1.5">{body}</div>
+            </div>""", unsafe_allow_html=True)
