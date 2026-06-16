@@ -6,6 +6,12 @@ import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
+try:
+    import tensorflow as _tf
+    TF_AVAILABLE = True
+except ImportError:
+    TF_AVAILABLE = False
+
 import streamlit as st
 from pathlib import Path
 import nbformat
@@ -296,6 +302,8 @@ def execute_nb(i, base_dir, mock, log_ph):
 # ─── Model loader (cached) ────────────────────────────────────────────────────
 @st.cache_resource(show_spinner="Cargando modelo …")
 def load_model(path: str):
+    if not TF_AVAILABLE:
+        raise ImportError("TensorFlow no está instalado en este entorno.")
     import tensorflow as tf
     return tf.keras.models.load_model(path)
 
@@ -339,6 +347,16 @@ tab_pipeline, tab_viewer, tab_pred, tab_pres = st.tabs([
 # TAB 1 — PREDICCIÓN
 # ═══════════════════════════════════════════════════════════════════════════════
 with tab_pred:
+    if not TF_AVAILABLE:
+        st.warning(
+            "**TensorFlow no está disponible en este entorno.**\n\n"
+            "La predicción en vivo requiere ejecutar la app **localmente** con el venv `caece-mineria` "
+            "y el modelo `transfer_mobilenetv2.keras` descargado de Google Drive en la carpeta `modelos/`.\n\n"
+            "En Streamlit Cloud solo están disponibles el **Pipeline Runner** y la **Presentación**.",
+            icon="⚠️",
+        )
+        st.stop()
+
     st.markdown("""
     <p style="color:#8b949e;margin-bottom:1.2rem;">
       Cargá un modelo entrenado (<code>.keras</code> / <code>.h5</code>) y subí una radiografía para obtener la predicción.
@@ -797,7 +815,7 @@ with tab_pres:
     st.markdown("## La Métrica Estrella: Costo Asimétrico del Error")
     card(
         "<span style='color:#e6edf3'>En diagnóstico médico, la <strong>Exactitud (Accuracy) es engañosa</strong>. "
-        "Un modelo que prediga todo como "sano" ignorará a los pacientes críticos.</span>",
+        "Un modelo que prediga todo como &ldquo;sano&rdquo; ignorará a los pacientes críticos.</span>",
         border_color="#f85149",
     )
 
