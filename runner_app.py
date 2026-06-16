@@ -1,4 +1,4 @@
-"""
+﻿"""
 CNN Pipeline Runner + Predicción en vivo
 TP Final — Aprendizaje Automático · Radiografías Veterinarias
 """
@@ -355,161 +355,160 @@ with tab_pred:
             "En Streamlit Cloud solo están disponibles el **Pipeline Runner** y la **Presentación**.",
             icon="⚠️",
         )
-        st.stop()
-
-    st.markdown("""
+    else:
+        st.markdown("""
     <p style="color:#8b949e;margin-bottom:1.2rem;">
       Cargá un modelo entrenado (<code>.keras</code> / <code>.h5</code>) y subí una radiografía para obtener la predicción.
     </p>
     """, unsafe_allow_html=True)
 
-    # ── Model selector ────────────────────────────────────────────────────────
-    # Buscar automáticamente modelos en subdirectorios comunes
-    default_model_dirs = [
-        NOTEBOOK_DIR / "modelos",
-        NOTEBOOK_DIR / "models",
-        NOTEBOOK_DIR,
-    ]
-    found_models = []
-    for d in default_model_dirs:
-        found_models += list(d.glob("*.keras")) + list(d.glob("*.h5"))
-    found_models = sorted(set(found_models))
-
-    col_model, col_btn = st.columns([5, 1])
-    with col_model:
-        if found_models:
-            model_options = {p.name: str(p) for p in found_models}
-            model_options["📂 Otra ruta…"] = "__custom__"
-            sel = st.selectbox("Modelo", options=list(model_options.keys()),
-                               label_visibility="visible")
-            if model_options[sel] == "__custom__":
-                model_path = st.text_input("Ruta completa al archivo del modelo:",
-                                           placeholder=r"C:\ruta\al\modelo.keras")
+        # ── Model selector ────────────────────────────────────────────────────────
+        # Buscar automáticamente modelos en subdirectorios comunes
+        default_model_dirs = [
+            NOTEBOOK_DIR / "modelos",
+            NOTEBOOK_DIR / "models",
+            NOTEBOOK_DIR,
+        ]
+        found_models = []
+        for d in default_model_dirs:
+            found_models += list(d.glob("*.keras")) + list(d.glob("*.h5"))
+        found_models = sorted(set(found_models))
+    
+        col_model, col_btn = st.columns([5, 1])
+        with col_model:
+            if found_models:
+                model_options = {p.name: str(p) for p in found_models}
+                model_options["📂 Otra ruta…"] = "__custom__"
+                sel = st.selectbox("Modelo", options=list(model_options.keys()),
+                                   label_visibility="visible")
+                if model_options[sel] == "__custom__":
+                    model_path = st.text_input("Ruta completa al archivo del modelo:",
+                                               placeholder=r"C:\ruta\al\modelo.keras")
+                else:
+                    model_path = model_options[sel]
             else:
-                model_path = model_options[sel]
-        else:
-            model_path = st.text_input(
-                "Ruta al modelo entrenado (`.keras` o `.h5`):",
-                placeholder=r"C:\ruta\al\modelo.keras",
-                help="Descargá el modelo desde Google Drive y pegá la ruta local aquí.",
+                model_path = st.text_input(
+                    "Ruta al modelo entrenado (`.keras` o `.h5`):",
+                    placeholder=r"C:\ruta\al\modelo.keras",
+                    help="Descargá el modelo desde Google Drive y pegá la ruta local aquí.",
+                )
+    
+        with col_btn:
+            st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
+            load_btn = st.button("⬇ Cargar", use_container_width=True)
+    
+        # Modelo status
+        model = None
+        if model_path and Path(model_path).is_file():
+            try:
+                model = load_model(model_path)
+                st.success(f"✅ Modelo cargado: `{Path(model_path).name}`")
+            except Exception as e:
+                st.error(f"❌ Error al cargar el modelo: {e}")
+        elif model_path and not Path(model_path).is_file():
+            st.warning("⚠️  Archivo no encontrado. Verificá la ruta o descargá el modelo desde Drive.")
+    
+        if not found_models and not model_path:
+            st.info(
+                "**¿Dónde está el modelo?**  \n"
+                "Los modelos se guardan en Google Drive en `TP_Final Aprendizaje Automatico/modelos/`.  \n"
+                "Descargalos y pegá la ruta local arriba, o copiá la carpeta `modelos/` junto a este archivo."
             )
-
-    with col_btn:
-        st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-        load_btn = st.button("⬇ Cargar", use_container_width=True)
-
-    # Modelo status
-    model = None
-    if model_path and Path(model_path).is_file():
-        try:
-            model = load_model(model_path)
-            st.success(f"✅ Modelo cargado: `{Path(model_path).name}`")
-        except Exception as e:
-            st.error(f"❌ Error al cargar el modelo: {e}")
-    elif model_path and not Path(model_path).is_file():
-        st.warning("⚠️  Archivo no encontrado. Verificá la ruta o descargá el modelo desde Drive.")
-
-    if not found_models and not model_path:
-        st.info(
-            "**¿Dónde está el modelo?**  \n"
-            "Los modelos se guardan en Google Drive en `TP_Final Aprendizaje Automatico/modelos/`.  \n"
-            "Descargalos y pegá la ruta local arriba, o copiá la carpeta `modelos/` junto a este archivo."
-        )
-
-    st.divider()
-
-    # ── Image upload + prediction ─────────────────────────────────────────────
-    col_upload, col_result = st.columns([1, 1], gap="large")
-
-    with col_upload:
-        st.markdown("#### Subir radiografía")
-        uploaded = st.file_uploader(
-            "Arrastrá o seleccioná la imagen",
-            type=["jpg", "jpeg", "png", "bmp", "tiff", "tif", "webp"],
-            label_visibility="collapsed",
-        )
-        if uploaded:
-            from PIL import Image as PILImage
-            img_bytes = uploaded.read()
-            img_show = PILImage.open(io.BytesIO(img_bytes)).convert("RGB")
-            st.image(img_show, caption=uploaded.name, use_container_width=True)
-            predict_btn = st.button("▶  Predecir", use_container_width=True)
-        else:
-            st.markdown("""
-            <div style="background:#161b22;border:2px dashed #30363d;border-radius:10px;
-                        padding:40px;text-align:center;color:#484f58;">
-              <div style="font-size:2.5rem">🫁</div>
-              <div style="margin-top:8px;font-size:.9rem">Arrastrá una Rx aquí</div>
-            </div>
-            """, unsafe_allow_html=True)
-            predict_btn = False
-
-    with col_result:
-        st.markdown("#### Resultado")
-        result_ph = st.empty()
-
-        if uploaded and predict_btn:
-            if model is None:
-                result_ph.error("❌ Cargá un modelo primero.")
+    
+        st.divider()
+    
+        # ── Image upload + prediction ─────────────────────────────────────────────
+        col_upload, col_result = st.columns([1, 1], gap="large")
+    
+        with col_upload:
+            st.markdown("#### Subir radiografía")
+            uploaded = st.file_uploader(
+                "Arrastrá o seleccioná la imagen",
+                type=["jpg", "jpeg", "png", "bmp", "tiff", "tif", "webp"],
+                label_visibility="collapsed",
+            )
+            if uploaded:
+                from PIL import Image as PILImage
+                img_bytes = uploaded.read()
+                img_show = PILImage.open(io.BytesIO(img_bytes)).convert("RGB")
+                st.image(img_show, caption=uploaded.name, use_container_width=True)
+                predict_btn = st.button("▶  Predecir", use_container_width=True)
             else:
-                with st.spinner("Analizando imagen …"):
-                    try:
-                        label, conf, probs = predict(model, img_bytes)
-                        is_pat = (label == "patologica")
-                        color  = "#f85149" if is_pat else "#3fb950"
-                        emoji  = "⚠️" if is_pat else "✅"
-                        titulo = "PATOLÓGICA" if is_pat else "NORMAL (OK)"
-
-                        p_ok  = probs[0] * 100
-                        p_pat = probs[1] * 100
-
-                        result_ph.markdown(f"""
-                        <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;
-                                    padding:28px 24px;border-top:4px solid {color};">
-                          <div style="font-size:2.8rem;margin-bottom:8px">{emoji}</div>
-                          <div style="color:{color};font-size:2rem;font-weight:800;
-                                      letter-spacing:1px;margin-bottom:4px">{titulo}</div>
-                          <div style="color:#8b949e;font-size:.85rem;margin-bottom:20px">
-                            confianza: <strong style="color:{color}">{conf*100:.1f}%</strong>
-                          </div>
-
-                          <div style="margin-bottom:10px">
-                            <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px;">
-                              <span>Normal (ok)</span>
-                              <span style="color:#3fb950">{p_ok:.1f}%</span>
+                st.markdown("""
+                <div style="background:#161b22;border:2px dashed #30363d;border-radius:10px;
+                            padding:40px;text-align:center;color:#484f58;">
+                  <div style="font-size:2.5rem">🫁</div>
+                  <div style="margin-top:8px;font-size:.9rem">Arrastrá una Rx aquí</div>
+                </div>
+                """, unsafe_allow_html=True)
+                predict_btn = False
+    
+        with col_result:
+            st.markdown("#### Resultado")
+            result_ph = st.empty()
+    
+            if uploaded and predict_btn:
+                if model is None:
+                    result_ph.error("❌ Cargá un modelo primero.")
+                else:
+                    with st.spinner("Analizando imagen …"):
+                        try:
+                            label, conf, probs = predict(model, img_bytes)
+                            is_pat = (label == "patologica")
+                            color  = "#f85149" if is_pat else "#3fb950"
+                            emoji  = "⚠️" if is_pat else "✅"
+                            titulo = "PATOLÓGICA" if is_pat else "NORMAL (OK)"
+    
+                            p_ok  = probs[0] * 100
+                            p_pat = probs[1] * 100
+    
+                            result_ph.markdown(f"""
+                            <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;
+                                        padding:28px 24px;border-top:4px solid {color};">
+                              <div style="font-size:2.8rem;margin-bottom:8px">{emoji}</div>
+                              <div style="color:{color};font-size:2rem;font-weight:800;
+                                          letter-spacing:1px;margin-bottom:4px">{titulo}</div>
+                              <div style="color:#8b949e;font-size:.85rem;margin-bottom:20px">
+                                confianza: <strong style="color:{color}">{conf*100:.1f}%</strong>
+                              </div>
+    
+                              <div style="margin-bottom:10px">
+                                <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px;">
+                                  <span>Normal (ok)</span>
+                                  <span style="color:#3fb950">{p_ok:.1f}%</span>
+                                </div>
+                                <div style="background:#21262d;border-radius:4px;height:8px;">
+                                  <div style="background:#3fb950;border-radius:4px;height:8px;width:{p_ok:.1f}%"></div>
+                                </div>
+                              </div>
+    
+                              <div>
+                                <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px;">
+                                  <span>Patológica</span>
+                                  <span style="color:#f85149">{p_pat:.1f}%</span>
+                                </div>
+                                <div style="background:#21262d;border-radius:4px;height:8px;">
+                                  <div style="background:#f85149;border-radius:4px;height:8px;width:{p_pat:.1f}%"></div>
+                                </div>
+                              </div>
+    
+                              <div style="margin-top:20px;padding-top:16px;border-top:1px solid #21262d;
+                                          color:#484f58;font-size:.75rem;">
+                                Modelo: {Path(model_path).name}
+                              </div>
                             </div>
-                            <div style="background:#21262d;border-radius:4px;height:8px;">
-                              <div style="background:#3fb950;border-radius:4px;height:8px;width:{p_ok:.1f}%"></div>
-                            </div>
-                          </div>
-
-                          <div>
-                            <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px;">
-                              <span>Patológica</span>
-                              <span style="color:#f85149">{p_pat:.1f}%</span>
-                            </div>
-                            <div style="background:#21262d;border-radius:4px;height:8px;">
-                              <div style="background:#f85149;border-radius:4px;height:8px;width:{p_pat:.1f}%"></div>
-                            </div>
-                          </div>
-
-                          <div style="margin-top:20px;padding-top:16px;border-top:1px solid #21262d;
-                                      color:#484f58;font-size:.75rem;">
-                            Modelo: {Path(model_path).name}
-                          </div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    except Exception as e:
-                        result_ph.error(f"❌ Error en predicción: {e}")
-        else:
-            result_ph.markdown("""
-            <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;
-                        padding:40px 24px;text-align:center;color:#484f58;">
-              <div style="font-size:2.2rem;margin-bottom:8px">📊</div>
-              <div style="font-size:.9rem">El resultado aparecerá aquí</div>
-            </div>
-            """, unsafe_allow_html=True)
-
+                            """, unsafe_allow_html=True)
+                        except Exception as e:
+                            result_ph.error(f"❌ Error en predicción: {e}")
+            else:
+                result_ph.markdown("""
+                <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;
+                            padding:40px 24px;text-align:center;color:#484f58;">
+                  <div style="font-size:2.2rem;margin-bottom:8px">📊</div>
+                  <div style="font-size:.9rem">El resultado aparecerá aquí</div>
+                </div>
+                """, unsafe_allow_html=True)
+    
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 2 — PIPELINE RUNNER
 # ═══════════════════════════════════════════════════════════════════════════════
