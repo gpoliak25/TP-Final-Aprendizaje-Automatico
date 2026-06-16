@@ -434,6 +434,13 @@ with tab_pred:
                 st.image(img_show, caption=uploaded.name, use_container_width=True)
                 predict_btn = st.button("▶  Predecir", use_container_width=True)
             else:
+                st.markdown("""
+                <div style="background:#161b22;border:2px dashed #30363d;border-radius:10px;
+                            padding:40px;text-align:center;color:#484f58;">
+                  <div style="font-size:2.5rem">🫁</div>
+                  <div style="margin-top:8px;font-size:.9rem">Arrastrá una Rx aquí</div>
+                </div>
+                """, unsafe_allow_html=True)
                 predict_btn = False
     
         with col_result:
@@ -497,6 +504,7 @@ with tab_pred:
                 result_ph.markdown("""
                 <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;
                             padding:40px 24px;text-align:center;color:#484f58;">
+                  <div style="font-size:2.2rem;margin-bottom:8px">📊</div>
                   <div style="font-size:.9rem">El resultado aparecerá aquí</div>
                 </div>
                 """, unsafe_allow_html=True)
