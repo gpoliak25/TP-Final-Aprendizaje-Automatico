@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-geist-sans), 'Geist Fallback';
+  --font-sans: var(--font-geist-sans), 'Geist Fallback';
+  --font-mono: var(--font-geist-mono), 'Geist Mono Fallback';
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* HUD semantic tokens */
+  --color-hud-cyan: var(--hud-cyan);
+  --color-hud-amber: var(--hud-amber);
+  --color-hud-red: var(--hud-red);
+  --color-hud-green: var(--hud-green);
+  --color-hud-line: var(--hud-line);
+  --color-hud-panel: var(--hud-panel);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+:root {
+  color-scheme: dark;
+
+  --background: oklch(0.16 0.018 248);
+  --foreground: oklch(0.95 0.008 240);
+
+  --card: oklch(0.205 0.02 248);
+  --card-foreground: oklch(0.95 0.008 240);
+
+  --popover: oklch(0.205 0.02 248);
+  --popover-foreground: oklch(0.95 0.008 240);
+
+  --primary: oklch(0.78 0.13 215);
+  --primary-foreground: oklch(0.16 0.02 248);
+
+  --secondary: oklch(0.26 0.022 248);
+  --secondary-foreground: oklch(0.95 0.008 240);
+
+  --muted: oklch(0.26 0.022 248);
+  --muted-foreground: oklch(0.68 0.02 240);
+
+  --accent: oklch(0.78 0.14 70);
+  --accent-foreground: oklch(0.18 0.02 60);
+
+  --destructive: oklch(0.62 0.21 22);
+  --destructive-foreground: oklch(0.98 0.01 20);
+
+  --border: oklch(0.4 0.04 230 / 35%);
+  --input: oklch(0.4 0.04 230 / 30%);
+  --ring: oklch(0.78 0.13 215);
+
+  /* HUD palette */
+  --hud-cyan: oklch(0.82 0.13 200);
+  --hud-amber: oklch(0.8 0.14 68);
+  --hud-red: oklch(0.64 0.2 24);
+  --hud-green: oklch(0.78 0.16 165);
+  --hud-line: oklch(0.55 0.05 220 / 40%);
+  --hud-panel: oklch(0.22 0.022 248);
+
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Subtle technical grid + glow utilities */
+@layer utilities {
+  .hud-grid {
+    background-image:
+      linear-gradient(to right, oklch(0.5 0.05 220 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.5 0.05 220 / 0.06) 1px, transparent 1px);
+    background-size: 38px 38px;
+  }
+  .hud-glow-cyan {
+    box-shadow: 0 0 0 1px oklch(0.82 0.13 200 / 0.35), 0 0 28px -6px oklch(0.82 0.13 200 / 0.45);
+  }
+  .hud-glow-amber {
+    box-shadow: 0 0 0 1px oklch(0.8 0.14 68 / 0.4), 0 0 28px -6px oklch(0.8 0.14 68 / 0.5);
+  }
+  .hud-glow-red {
+    box-shadow: 0 0 0 1px oklch(0.64 0.2 24 / 0.45), 0 0 30px -6px oklch(0.64 0.2 24 / 0.55);
+  }
+  .hud-glow-green {
+    box-shadow: 0 0 0 1px oklch(0.78 0.16 165 / 0.4), 0 0 28px -6px oklch(0.78 0.16 165 / 0.5);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
