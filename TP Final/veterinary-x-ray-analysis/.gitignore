@@ -15,3 +15,9 @@ node_modules
 .DS_Store
 package-lock.json
 public/*.onnx
+# ...pero el modelo de la demo en vivo SÍ debe publicarse
+!public/transfer_mobilenetv2.onnx
+
+# logs locales del build
+install.log
+build.log

@@ -26,19 +26,24 @@ Se te presenta una radiografía de tórax analizada por un modelo de deep learni
 
 ${contextLines}
 
-Analizá la imagen y respondé en español con el siguiente formato:
+Analizá la imagen y respondé en español, en formato Markdown, usando EXACTAMENTE estos títulos de sección con "## " (en este orden):
 
-**Hallazgos radiológicos**
+## Conclusión diagnóstica
+Resumen ejecutivo de 2 a 4 oraciones que sintetice el diagnóstico más probable y el nivel de confianza, integrando los hallazgos radiológicos con la predicción del modelo. Debe ser el PRIMER punto del informe.
+
+## Hallazgos radiológicos
 Describí las estructuras y hallazgos visibles (silueta cardíaca, pulmones, caja torácica, diafragma, etc.).
 
-**Concordancia con el modelo**
+## Concordancia con el modelo
 ¿Los hallazgos radiológicos concuerdan con la predicción del modelo? Explicá el razonamiento.
 
-**Diagnósticos diferenciales**
+## Diagnósticos diferenciales
 Listá los posibles diagnósticos ordenados por probabilidad.
 
-**Recomendaciones**
+## Recomendaciones
 Próximos pasos clínicos sugeridos.
+
+No agregues un título general al principio: empezá directamente con "## Conclusión diagnóstica".
 
 ---
 *Análisis demostrativo — Trabajo Final de Maestría en Ciencia de Datos, CAECE 2026.*`
@@ -52,7 +57,7 @@ Próximos pasos clínicos sugeridos.
     },
     body: JSON.stringify({
       model,
-      max_tokens: 1024,
+      max_tokens: 3000,
       messages: [
         {
           role: "user",
