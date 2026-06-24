@@ -386,7 +386,7 @@ function ResultsApproach1() {
           </Panel>
           <Panel accent="red">
             <div className="flex items-center justify-between">
-              <Stat label="AUC" value="0,451" accent="red" />
+              <Stat label="AUC" value="0,446" accent="red" />
               <span className="rounded-md border border-hud-red/40 bg-hud-red/10 px-2.5 py-1 text-xs font-semibold text-hud-red">
                 Ilusión matemática
               </span>
@@ -471,7 +471,7 @@ function Synthesis() {
     { metric: "Accuracy", cnn: "0,448", tl: "0,806" },
     { metric: "Precision", cnn: "—", tl: "0,793" },
     { metric: "Recall", cnn: "—", tl: "0,767" },
-    { metric: "AUC", cnn: "0,451", tl: "0,852" },
+    { metric: "AUC", cnn: "0,446", tl: "0,852" },
   ]
   // ROC: CNN near diagonal, Transfer bowed toward top-left
   const cnnRoc: [number, number][] = [
@@ -521,7 +521,7 @@ function Synthesis() {
           </div>
           <Legend
             series={[
-              { label: "CNN · 0,451", color: "oklch(0.6 0.02 240)" },
+              { label: "CNN · 0,446", color: "oklch(0.6 0.02 240)" },
               { label: "Transfer · 0,852", color: CYAN },
             ]}
           />
